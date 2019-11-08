@@ -1,5 +1,5 @@
-{ stdenv, fetchFromGitHub, boxfort, cmake, libcsptr, pkgconfig, gettext, dyncall
-, nanomsg, python37Packages }:
+{ stdenv, fetchFromGitHub, boxfort, cmake, libcsptr, pkg-config, gettext
+, dyncall , nanomsg, python37Packages }:
 
 stdenv.mkDerivation rec {
   version = "2.3.3";
@@ -15,31 +15,35 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  nativeBuildInputs = [ cmake pkgconfig ];
+  nativeBuildInputs = [ cmake pkg-config ];
 
   buildInputs = [
-    boxfort
+    boxfort.dev
     dyncall
     gettext
     libcsptr
     nanomsg
   ];
 
-  checkInputs = with python37Packages; [
-    cram
-  ];
+  checkInputs = with python37Packages; [ cram ];
+
   cmakeFlags = [ "-DCTESTS=ON" ];
   doCheck = true;
   preCheck = ''
     export LD_LIBRARY_PATH=`pwd`:$LD_LIBRARY_PATH
-    '';
+  '';
   checkTarget = "criterion_tests test";
+
+  outputs = [ "dev" "out" ];
 
   meta = with stdenv.lib; {
     description = "A cross-platform C and C++ unit testing framework for the 21th century";
     homepage = "https://github.com/Snaipe/Criterion";
     license = licenses.mit;
-    maintainers = [];
+    maintainers = with maintainers; [
+      thesola10
+      Yumasi
+    ];
     platforms = platforms.unix;
   };
 }
